@@ -316,7 +316,7 @@ def build_image() {
 
 def helm_init() {
     sh """
-        helm init --client-only
+        # helm init --client-only
         helm version
     """
 
