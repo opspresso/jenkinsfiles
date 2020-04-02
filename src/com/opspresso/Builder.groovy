@@ -270,7 +270,7 @@ def build_chart(path = "") {
     helm_init()
 
     // make chart
-    make_chart()
+    make_chart(path)
 
     // helm plugin
     count = sh(script: "helm plugin list | grep 'Push chart package' | wc -l", returnStdout: true).trim()
