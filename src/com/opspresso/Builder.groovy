@@ -269,24 +269,21 @@ def build_chart(path = "") {
     // helm init
     helm_init()
 
+    // helm plugin
+    helm_plugin()
+
     // make chart
     make_chart(path)
 
-    // helm plugin
-    count = sh(script: "helm plugin list | grep 'Push chart package' | wc -l", returnStdout: true).trim()
-    if ("${count}" == "0") {
-        sh """
-            helm plugin install https://github.com/chartmuseum/helm-push
-            helm plugin list
-        """
-    }
-
     // helm push
     dir("${path}") {
-        sh "helm lint ."
+        sh """
+            cat Chart.yaml
+            helm lint .
+        """
 
         if (chartmuseum) {
-            sh "helm push ${path} chartmuseum"
+            sh "helm push . chartmuseum"
         }
 
         // if (harbor) {
@@ -296,7 +293,7 @@ def build_chart(path = "") {
 
     sh """
         helm repo update
-        helm search ${name}
+        helm search repo ${name}
     """
 }
 
@@ -316,7 +313,6 @@ def build_image() {
 
 def helm_init() {
     sh """
-        # helm init --client-only
         helm version
     """
 
@@ -332,6 +328,17 @@ def helm_init() {
         helm repo list
         helm repo update
     """
+}
+
+def helm_plugin() {
+    // helm plugin
+    count = sh(script: "helm plugin list | grep 'Push chart package' | wc -l", returnStdout: true).trim()
+    if ("${count}" == "0") {
+        sh """
+            helm plugin install https://github.com/chartmuseum/helm-push
+            helm plugin list
+        """
+    }
 }
 
 def apply(cluster = "", namespace = "", type = "", yaml = "") {
@@ -439,7 +446,7 @@ def deploy(cluster = "", namespace = "", sub_domain = "", profile = "", values_p
 
     // latest version
     if (version == "latest") {
-        version = sh(script: "helm search chartmuseum/${name} | grep ${name} | head -1 | awk '{print \$2}'", returnStdout: true).trim()
+        version = sh(script: "helm search repo chartmuseum/${name} | grep ${name} | head -1 | awk '{print \$2}'", returnStdout: true).trim()
         if (version == "") {
             echo "deploy:latest version is null."
             throw new RuntimeException("latest version is null.")
@@ -503,8 +510,8 @@ def deploy(cluster = "", namespace = "", sub_domain = "", profile = "", values_p
     }
 
     sh """
-        helm search ${name}
-        helm history ${name}-${namespace} --max 10
+        helm list -n ${namespace}
+        helm history ${name}-${namespace} -n ${namespace} --max 10
     """
 
     // print ingress host
@@ -597,7 +604,7 @@ def rollback(cluster = "", namespace = "", revision = "") {
     helm_init()
 
     sh """
-        helm search ${name}
+        helm search repo chartmuseum/${name}
         helm history ${name}-${namespace} --max 10
     """
 
@@ -625,7 +632,7 @@ def remove(cluster = "", namespace = "") {
     helm_init()
 
     sh """
-        helm search ${name}
+        helm search repo ${name}
         helm history ${name}-${namespace} --max 10
     """
 
