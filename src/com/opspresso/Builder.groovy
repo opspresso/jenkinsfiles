@@ -274,7 +274,10 @@ def build_chart(path = "") {
 
     // helm push
     dir("${path}") {
-        sh "helm lint ."
+        sh """
+            cat Chart.yaml
+            helm lint .
+        """
 
         if (chartmuseum) {
             sh "helm push . chartmuseum"
