@@ -510,8 +510,8 @@ def deploy(cluster = "", namespace = "", sub_domain = "", profile = "", values_p
     }
 
     sh """
-        helm search repo ${name}
-        helm history ${name}-${namespace} --max 10
+        helm list -n ${namespace}
+        helm history ${name}-${namespace} -n ${namespace} --max 10
     """
 
     // print ingress host
@@ -604,7 +604,7 @@ def rollback(cluster = "", namespace = "", revision = "") {
     helm_init()
 
     sh """
-        helm search repo ${name}
+        helm search repo chartmuseum/${name}
         helm history ${name}-${namespace} --max 10
     """
 
