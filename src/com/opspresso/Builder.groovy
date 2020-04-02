@@ -62,7 +62,7 @@ def load_variables() {
         cat ${path} | grep def
     """
 
-    if (!fileExists(path)) {
+    if (!fileExists("${path}")) {
         echo "load_variables:no file ${path}"
         throw new RuntimeException("no file ${path}")
     }
@@ -97,7 +97,7 @@ def scan_langusge(target = "", target_lang = "") {
                 if (this.nexus) {
                     def settings = "/root/.m2/settings.xml"
 
-                    // if (fileExists(settings)) {
+                    // if (fileExists("${settings}")) {
                     def m2_home = "${home}/.m2"
 
                     def mirror_of  = "*,!nexus-public,!nexus-releases,!nexus-snapshots"
@@ -234,12 +234,12 @@ def make_chart(path = "", latest = false) {
         version = scan_images_version(name, true)
     }
 
-    if (!fileExists(path) {
+    if (!fileExists("${path}")) {
         echo "no file ${path}"
         return
     }
 
-    dir(path) {
+    dir("${path}") {
         sh """
             sed -i -e \"s/name: .*/name: ${name}/\" Chart.yaml
             sed -i -e \"s/appVersion: .*/appVersion: ${appVersion}/\" Chart.yaml
@@ -273,7 +273,7 @@ def build_chart(path = "") {
     make_chart(path)
 
     // helm push
-    dir(path) {
+    dir("${path}") {
         sh "helm lint ."
 
         if (chartmuseum) {
@@ -646,7 +646,7 @@ def get_source_root(source_root = "") {
 def get_m2_settings() {
     if (this.nexus) {
         settings = "/home/jenkins/.m2/settings.xml"
-        if (fileExists(settings)) {
+        if (fileExists("${settings}")) {
             return "-s ${settings}"
         }
     }
