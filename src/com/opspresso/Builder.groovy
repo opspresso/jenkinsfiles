@@ -51,9 +51,6 @@ def scan(source_lang = "") {
 
     // version
     set_version()
-
-    // chart
-    make_chart()
 }
 
 def load_variables() {
@@ -269,7 +266,11 @@ def build_chart(path = "") {
         path = "charts/${name}"
     }
 
+    // helm init
     helm_init()
+
+    // make chart
+    make_chart()
 
     // helm plugin
     count = sh(script: "helm plugin list | grep 'Push chart package' | wc -l", returnStdout: true).trim()
@@ -285,7 +286,7 @@ def build_chart(path = "") {
         sh "helm lint ."
 
         if (chartmuseum) {
-            sh "helm push . chartmuseum"
+            sh "helm push ${path} chartmuseum"
         }
 
         // if (harbor) {
@@ -293,7 +294,6 @@ def build_chart(path = "") {
         // }
     }
 
-    // helm repo
     sh """
         helm repo update
         helm search ${name}
