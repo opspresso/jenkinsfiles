@@ -674,6 +674,22 @@ def npm_test(source_root = "") {
     }
 }
 
+def npm_sonar(source_root = "", sonarqube = "") {
+    if (!sonarqube) {
+        if (!this.sonarqube) {
+            echo "npm_sonar:sonarqube is null."
+            throw new RuntimeException("sonarqube is null.")
+        }
+        sonarqube = "https://${this.sonarqube}"
+    }
+    source_root = get_source_root(source_root)
+    dir("${source_root}") {
+        sh """
+            sonar-scanner
+        """
+    }
+}
+
 def mvn_build(source_root = "") {
     source_root = get_source_root(source_root)
     dir("${source_root}") {
@@ -687,14 +703,6 @@ def mvn_test(source_root = "") {
     dir("${source_root}") {
         settings = get_m2_settings()
         sh "mvn test ${settings}"
-    }
-}
-
-def mvn_deploy(source_root = "") {
-    source_root = get_source_root(source_root)
-    dir("${source_root}") {
-        settings = get_m2_settings()
-        sh "mvn deploy ${settings} -DskipTests=true"
     }
 }
 
