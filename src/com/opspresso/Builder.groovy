@@ -684,9 +684,7 @@ def npm_sonar(source_root = "", sonarqube = "") {
     }
     source_root = get_source_root(source_root)
     dir("${source_root}") {
-        sh """
-            sonar-scanner
-        """
+        sh "sonar-scanner"
     }
 }
 
