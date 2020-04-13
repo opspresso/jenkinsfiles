@@ -681,6 +681,7 @@ def npm_sonar(source_root = "" ) {
     }
     source_root = get_source_root(source_root)
     dir("${source_root}") {
+        sh "npm install -g sonarqube-scanner"
         sh "sonar-scanner -Dsonar.host.url=https://${this.sonarqube}"
     }
 }
