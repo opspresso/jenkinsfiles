@@ -77,8 +77,8 @@ def load_variables() {
         this.nexus = val.nexus
         this.registry = val.registry
         this.chartmuseum = val.chartmuseum
+        this.sonarqube = val.sonarqube
         // this.harbor = val.harbor
-        // this.sonarqube = val.sonarqube
     }
 }
 
