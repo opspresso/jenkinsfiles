@@ -77,8 +77,8 @@ def load_variables() {
         this.nexus = val.nexus
         this.registry = val.registry
         this.chartmuseum = val.chartmuseum
+        this.sonarqube = val.sonarqube
         // this.harbor = val.harbor
-        // this.sonarqube = val.sonarqube
     }
 }
 
@@ -674,19 +674,15 @@ def npm_test(source_root = "") {
     }
 }
 
-def npm_sonar(source_root = "", sonarqube = "") {
-    if (!sonarqube) {
-        if (!this.sonarqube) {
-            echo "npm_sonar:sonarqube is null."
-            throw new RuntimeException("sonarqube is null.")
-        }
-        sonarqube = "https://${this.sonarqube}"
+def npm_sonar(source_root = "" ) {
+    if (!this.sonarqube) {
+        echo "npm_sonar:sonarqube is null."
+        throw new RuntimeException("sonarqube is null.")
     }
     source_root = get_source_root(source_root)
     dir("${source_root}") {
-        sh """
-            sonar-scanner
-        """
+        sh "npm install -g sonarqube-scanner"
+        sh "sonar-scanner -Dsonar.host.url=https://${this.sonarqube}"
     }
 }
 
@@ -706,18 +702,15 @@ def mvn_test(source_root = "") {
     }
 }
 
-def mvn_sonar(source_root = "", sonarqube = "") {
-    if (!sonarqube) {
-        if (!this.sonarqube) {
-            echo "mvn_sonar:sonarqube is null."
-            throw new RuntimeException("sonarqube is null.")
-        }
-        sonarqube = "https://${this.sonarqube}"
+def mvn_sonar(source_root = "" ) {
+    if (!this.sonarqube) {
+        echo "mvn_sonar:sonarqube is null."
+        throw new RuntimeException("sonarqube is null.")
     }
     source_root = get_source_root(source_root)
     dir("${source_root}") {
         settings = get_m2_settings()
-        sh "mvn sonar:sonar ${settings} -Dsonar.host.url=${sonarqube} -DskipTests=true"
+        sh "mvn sonar:sonar ${settings} -Dsonar.host.url=https://${this.sonarqube} -DskipTests=true"
     }
 }
 
