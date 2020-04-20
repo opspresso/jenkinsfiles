@@ -319,6 +319,7 @@ def build_image() {
 
     if (harbor) {
         sh """
+            echo 'password' | docker login ${harbor} -u admin --password-stdin
             docker tag ${name}:${version} ${harbor}/library/${name}:${version}
             docker push ${harbor}/library/${name}:${version}
         """
