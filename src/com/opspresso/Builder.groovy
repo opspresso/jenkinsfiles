@@ -73,12 +73,12 @@ def load_variables() {
     this.slack_token = val.slack_token
 
     if (val.role == "devops") {
+        this.chartmuseum = val.chartmuseum
+        this.harbor = val.harbor
         this.jenkins = val.jenkins
         this.nexus = val.nexus
         this.registry = val.registry
-        this.chartmuseum = val.chartmuseum
         this.sonarqube = val.sonarqube
-        // this.harbor = val.harbor
     }
 }
 
@@ -286,9 +286,10 @@ def build_chart(path = "") {
             sh "helm push . chartmuseum"
         }
 
-        // if (harbor) {
-        //     sh "helm push --username admin --password password . harbor"
-        // }
+        if (harbor) {
+            // TODO username, password
+            sh "helm push --username admin --password password . harbor"
+        }
     }
 
     sh """
@@ -307,8 +308,21 @@ def build_image() {
         throw new RuntimeException("version is null.")
     }
 
-    sh "docker build -t ${registry}/${name}:${version} ."
-    sh "docker push ${registry}/${name}:${version}"
+    sh "docker build -t ${name}:${version} ."
+
+    if (registry) {
+        sh """
+            docker tag ${name}:${version} ${registry}/${name}:${version}
+            docker push ${registry}/${name}:${version}
+        """
+    }
+
+    if (harbor) {
+        sh """
+            docker tag ${name}:${version} ${harbor}/library/${name}:${version}
+            docker push ${harbor}/library/${name}:${version}
+        """
+    }
 }
 
 def helm_init() {
@@ -320,9 +334,9 @@ def helm_init() {
         sh "helm repo add chartmuseum https://${chartmuseum}"
     }
 
-    // if (harbor) {
-    //     sh "helm repo add harbor https://${harbor}/chartrepo/library"
-    // }
+    if (harbor) {
+        sh "helm repo add harbor https://${harbor}/chartrepo/library"
+    }
 
     sh """
         helm repo list
