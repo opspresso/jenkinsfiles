@@ -74,7 +74,7 @@ def load_variables() {
 
     if (val.role == "devops") {
         this.chartmuseum = val.chartmuseum
-        this.harbor = val.harbor
+        // this.harbor = val.harbor
         this.jenkins = val.jenkins
         this.nexus = val.nexus
         this.registry = val.registry
