@@ -21,6 +21,7 @@ def prepare(name = "sample") {
 
     this.slack_token = ""
 
+    this.archiva = ""
     this.chartmuseum = ""
     this.harbor = ""
     this.jenkins = ""
@@ -73,8 +74,9 @@ def load_variables() {
     this.slack_token = val.slack_token
 
     if (val.role == "devops") {
+        this.archiva = val.archiva
         this.chartmuseum = val.chartmuseum
-        // this.harbor = val.harbor
+        this.harbor = val.harbor
         this.jenkins = val.jenkins
         this.nexus = val.nexus
         this.registry = val.registry
@@ -94,14 +96,14 @@ def scan_langusge(target = "", target_lang = "") {
 
             // maven mirror
             if (target_lang == "java") {
-                if (this.nexus) {
+                if (this.archiva) {
                     def settings = "/root/.m2/settings.xml"
 
                     // if (fileExists("${settings}")) {
                     def m2_home = "${home}/.m2"
 
-                    def mirror_of  = "*,!nexus-public,!nexus-releases,!nexus-snapshots"
-                    def mirror_url = "https://${nexus}/repository/maven-public/"
+                    def mirror_of  = "*"
+                    def mirror_url = "https://${archiva}/repository/internal/"
                     def mirror_xml = "<mirror><id>mirror</id><url>${mirror_url}</url><mirrorOf>${mirror_of}</mirrorOf></mirror>"
 
                     sh """
@@ -111,6 +113,23 @@ def scan_langusge(target = "", target_lang = "") {
                     """
                     // }
                 }
+                // if (this.nexus) {
+                //     def settings = "/root/.m2/settings.xml"
+
+                //     // if (fileExists("${settings}")) {
+                //     def m2_home = "${home}/.m2"
+
+                //     def mirror_of  = "*,!nexus-public,!nexus-releases,!nexus-snapshots"
+                //     def mirror_url = "https://${nexus}/repository/maven-public/"
+                //     def mirror_xml = "<mirror><id>mirror</id><url>${mirror_url}</url><mirrorOf>${mirror_of}</mirrorOf></mirror>"
+
+                //     sh """
+                //         mkdir -p ${m2_home}
+                //         cp -f ${settings} ${m2_home}/settings.xml
+                //         sed -i -e \"s|<!-- ### configured mirrors ### -->|${mirror_xml}|\" ${m2_home}/settings.xml
+                //     """
+                //     // }
+                // }
             }
         }
     }
@@ -286,10 +305,10 @@ def build_chart(path = "") {
             sh "helm push . chartmuseum"
         }
 
-        if (harbor) {
-            // TODO username, password
-            sh "helm push --username admin --password password . harbor"
-        }
+        // if (harbor) {
+        //     // TODO username, password
+        //     sh "helm push --username admin --password password . harbor"
+        // }
     }
 
     sh """
@@ -317,13 +336,13 @@ def build_image() {
         """
     }
 
-    if (harbor) {
-        sh """
-            echo 'password' | docker login ${harbor} -u admin --password-stdin
-            docker tag ${name}:${version} ${harbor}/library/${name}:${version}
-            docker push ${harbor}/library/${name}:${version}
-        """
-    }
+    // if (harbor) {
+    //     sh """
+    //         echo 'password' | docker login ${harbor} -u admin --password-stdin
+    //         docker tag ${name}:${version} ${harbor}/library/${name}:${version}
+    //         docker push ${harbor}/library/${name}:${version}
+    //     """
+    // }
 }
 
 def helm_init() {
@@ -335,9 +354,9 @@ def helm_init() {
         sh "helm repo add chartmuseum https://${chartmuseum}"
     }
 
-    if (harbor) {
-        sh "helm repo add harbor https://${harbor}/chartrepo/library"
-    }
+    // if (harbor) {
+    //     sh "helm repo add harbor https://${harbor}/chartrepo/library"
+    // }
 
     sh """
         helm repo list
