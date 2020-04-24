@@ -21,6 +21,7 @@ def prepare(name = "sample") {
 
     this.slack_token = ""
 
+    this.archiva = ""
     this.chartmuseum = ""
     this.harbor = ""
     this.jenkins = ""
@@ -73,6 +74,7 @@ def load_variables() {
     this.slack_token = val.slack_token
 
     if (val.role == "devops") {
+        // this.archiva = val.archiva
         this.chartmuseum = val.chartmuseum
         // this.harbor = val.harbor
         this.jenkins = val.jenkins
