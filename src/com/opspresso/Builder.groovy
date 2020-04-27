@@ -294,6 +294,15 @@ def build_chart(path = "") {
     // make chart
     make_chart(path)
 
+    // helm dependency build
+    if (fileExists("${path}/requirements.yaml")) {
+        dir("charts") {
+            sh """
+                helm dependency build ${name}
+            """
+        }
+    }
+
     // helm push
     dir("${path}") {
         sh """
