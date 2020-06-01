@@ -831,7 +831,7 @@ def send(token = "", color = "", title = "", message = "", footer = "") {
     try {
         if (token && token != "") {
             sh """
-                curl -sL opspresso.com/tools/slack | bash -s -- --token=\'${token}\' \
+                curl -sL opspresso.github.io/tools/slack.sh | bash -s -- --token=\'${token}\' \
                 --footer=\'$footer\' --footer_icon='https://jenkins.io/sites/default/files/jenkins_favicon.ico' \
                 --color=\'${color}\' --title=\'${title}\' \'${message}\'
             """
