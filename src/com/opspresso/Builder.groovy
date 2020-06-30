@@ -720,7 +720,8 @@ def npm_test(source_root = "") {
 def npm_sonar(source_root = "" ) {
     if (!this.sonarqube) {
         echo "npm_sonar:sonarqube is null."
-        throw new RuntimeException("sonarqube is null.")
+        // throw new RuntimeException("sonarqube is null.")
+        return
     }
     source_root = get_source_root(source_root)
     dir("${source_root}") {
@@ -748,7 +749,8 @@ def mvn_test(source_root = "") {
 def mvn_sonar(source_root = "" ) {
     if (!this.sonarqube) {
         echo "mvn_sonar:sonarqube is null."
-        throw new RuntimeException("sonarqube is null.")
+        // throw new RuntimeException("sonarqube is null.")
+        return
     }
     source_root = get_source_root(source_root)
     dir("${source_root}") {
