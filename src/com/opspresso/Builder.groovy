@@ -96,14 +96,14 @@ def scan_langusge(target = "", target_lang = "") {
 
             // maven mirror
             if (target_lang == "java") {
-                if (this.archiva) {
+                if (this.nexus) {
                     def settings = "/root/.m2/settings.xml"
 
                     // if (fileExists("${settings}")) {
                     def m2_home = "${home}/.m2"
 
-                    def mirror_of  = "*"
-                    def mirror_url = "https://${archiva}/repository/internal/"
+                    def mirror_of  = "*,!nexus-public,!nexus-releases,!nexus-snapshots"
+                    def mirror_url = "https://${nexus}/repository/maven-public/"
                     def mirror_xml = "<mirror><id>mirror</id><url>${mirror_url}</url><mirrorOf>${mirror_of}</mirrorOf></mirror>"
 
                     sh """
@@ -113,14 +113,14 @@ def scan_langusge(target = "", target_lang = "") {
                     """
                     // }
                 }
-                if (this.nexus) {
+                else if (this.archiva) {
                     def settings = "/root/.m2/settings.xml"
 
                     // if (fileExists("${settings}")) {
                     def m2_home = "${home}/.m2"
 
-                    def mirror_of  = "*,!nexus-public,!nexus-releases,!nexus-snapshots"
-                    def mirror_url = "https://${nexus}/repository/maven-public/"
+                    def mirror_of  = "*"
+                    def mirror_url = "https://${archiva}/repository/internal/"
                     def mirror_xml = "<mirror><id>mirror</id><url>${mirror_url}</url><mirrorOf>${mirror_of}</mirrorOf></mirror>"
 
                     sh """
@@ -694,7 +694,7 @@ def get_source_root(source_root = "") {
 }
 
 def get_m2_settings() {
-    if (this.nexus) {
+    if (this.nexus || this.archiva) {
         settings = "/home/jenkins/.m2/settings.xml"
         if (fileExists("${settings}")) {
             return "-s ${settings}"
